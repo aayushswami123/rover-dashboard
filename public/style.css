@@ -1020,3 +1020,92 @@ main {
 .status-online i {
   animation: pulse 2s infinite;
 }
+
+/* updatesin the css for the mobile view
+@media (max-width: 480px) {
+  /* Improve sidebar toggle spacing */
+  @media (max-width: 480px) {
+  .toggle-sidebar {
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  /* Sidebar header size */
+  .sidebar h1 {
+    font-size: 18px;
+  }
+
+  .sidebar li a {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* Sensor values */
+  .card p, .sensor-item p, .telemetry-value {
+    font-size: 16px;
+  }
+
+  /* Table overflow handling */
+  .commands-table, .commands-table th, .commands-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .commands-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Buttons spacing */
+  .quick-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .action-btn, .camera-btn, .control-btn {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  /* Reduce margins/paddings */
+  main {
+    padding: 15px;
+  }
+
+  .card, .sensor-details, .map-container, .grafana-section, .recent-commands, .camera-settings, .control-pad, .actions-panel, .telemetry-panel, .command-log, .command-form-section {
+    padding: 15px;
+  }
+
+  /* Flatten overlay on camera */
+  .camera-overlay {
+    flex-direction: column;
+    align-items: flex-start;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .camera-info span {
+    margin-bottom: 5px;
+  }
+
+  /* Reduce sidebar padding */
+  .sidebar {
+    padding: 15px;
+  }
+
+  /* Compress telemetry grid */
+  .telemetry-grid {
+    gap: 6px;
+  }
+
+  /* Flatten control layout stacking */
+  .camera-controls-panel .control-group,
+  .control-group {
+    grid-template-columns: 1fr;
+  }
+}

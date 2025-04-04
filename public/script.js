@@ -262,6 +262,13 @@ function updateRecentCommands(log) {
     tableBody.appendChild(row);
   });
 }
+document.querySelectorAll('.sidebar a').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.body.classList.remove('sidebar-open');
+    }
+  });
+});
 
 
 simulateSensorData();
