@@ -1,25 +1,19 @@
-// Socket.io connection (ensure you have socket.io-client in your project)
+// Socket.io connection
 let socket;
 try {
   socket = io();
-  
-  // Listen for sensor updates
   socket.on('sensorUpdate', function(data) {
     updateDashboard(data);
   });
-  
-  // Handle connection errors
   socket.on('connect_error', function() {
     console.log('Connection error');
     updateSystemStatus('offline');
   });
 } catch (e) {
   console.error('Socket.io initialization error:', e);
-  // Use mock data if socket connection fails
   simulateSensorData();
 }
 
-// DOM elements
 const batteryElement = document.getElementById('battery');
 const batteryLevelElement = document.getElementById('batteryLevel');
 const statusIndicatorElement = document.getElementById('statusIndicator');
@@ -31,86 +25,76 @@ const windSpeedElement = document.getElementById('windSpeed');
 const solarRadiationElement = document.getElementById('solarRadiation');
 const soilMoistureElement = document.getElementById('soilMoisture');
 const uvIndexElement = document.getElementById('uvIndex');
-const cameraFeedPlaceholder = document.getElementById('cameraFeedPlaceholder');
 const toggleSidebarBtn = document.getElementById('toggleSidebar');
 
-// Camera control buttons
-document.getElementById('panLeft').addEventListener('click', () => cameraControl('panLeft'));
-document.getElementById('panRight').addEventListener('click', () => cameraControl('panRight'));
-document.getElementById('panUp').addEventListener('click', () => cameraControl('panUp'));
-document.getElementById('panDown').addEventListener('click', () => cameraControl('panDown'));
-document.getElementById('zoomIn').addEventListener('click', () => cameraControl('zoomIn'));
-document.getElementById('zoomOut').addEventListener('click', () => cameraControl('zoomOut'));
-document.getElementById('takePhoto').addEventListener('click', () => takePhoto());
+// Event listeners for actions (if present)
+if (document.getElementById('sendCommand')) {
+  document.getElementById('sendCommand').addEventListener('click', sendCommand);
+}
+if (document.getElementById('downloadData')) {
+  document.getElementById('downloadData').addEventListener('click', downloadData);
+}
+if (document.getElementById('emergencyStop')) {
+  document.getElementById('emergencyStop').addEventListener('click', emergencyStop);
+}
+if (document.getElementById('goToControl')) {
+  document.getElementById('goToControl').addEventListener('click', () => {
+    window.location.href = 'control.html';
+  });
+}
+if (toggleSidebarBtn) {
+  toggleSidebarBtn.addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-open');
+  });
+}
 
-// Action buttons
-document.getElementById('sendCommand').addEventListener('click', () => sendCommand());
-document.getElementById('downloadData').addEventListener('click', () => downloadData());
-document.getElementById('emergencyStop').addEventListener('click', () => emergencyStop());
-
-// Toggle sidebar on mobile
-toggleSidebarBtn.addEventListener('click', () => {
-  document.body.classList.toggle('sidebar-open');
-});
-
-// Update dashboard with received data
 function updateDashboard(data) {
-  if (data.battery) {
+  if (data.battery && batteryElement) {
     const batteryValue = parseFloat(data.battery);
-    batteryElement.textContent = `${batteryValue}%`;
-    batteryLevelElement.style.width = `${batteryValue}%`;
-    
-    // Update battery color based on level
-    if (batteryValue < 20) {
-      batteryLevelElement.className = 'battery-level low-battery';
-    } else if (batteryValue < 50) {
-      batteryLevelElement.className = 'battery-level medium-battery';
-    } else {
-      batteryLevelElement.className = 'battery-level';
+    batteryElement.textContent = `${batteryValue.toFixed(1)}%`;
+    if (batteryLevelElement) {
+      batteryLevelElement.style.width = `${batteryValue}%`;
+      if (batteryValue < 20) {
+        batteryLevelElement.className = 'battery-level low-battery';
+      } else if (batteryValue < 50) {
+        batteryLevelElement.className = 'battery-level medium-battery';
+      } else {
+        batteryLevelElement.className = 'battery-level';
+      }
     }
   }
-  
   if (data.status) {
     updateSystemStatus(data.status);
   }
-  
-  if (data.temperature) {
-    temperatureElement.textContent = `${data.temperature}°C`;
+  if (data.temperature && temperatureElement) {
+    temperatureElement.textContent = `${data.temperature.toFixed(1)}°C`;
   }
-  
-  if (data.location) {
+  if (data.location && locationElement) {
     locationElement.textContent = data.location;
   }
-  
-  if (data.humidity) {
-    humidityElement.textContent = `${data.humidity}%`;
+  if (data.humidity && humidityElement) {
+    humidityElement.textContent = `${data.humidity.toFixed(1)}%`;
   }
-  
-  if (data.pressure) {
+  if (data.pressure && pressureElement) {
     pressureElement.textContent = `${data.pressure} hPa`;
   }
-  
-  if (data.windSpeed) {
-    windSpeedElement.textContent = `${data.windSpeed} m/s`;
+  if (data.windSpeed && windSpeedElement) {
+    windSpeedElement.textContent = `${data.windSpeed.toFixed(1)} m/s`;
   }
-  
-  if (data.solarRadiation) {
+  if (data.solarRadiation && solarRadiationElement) {
     solarRadiationElement.textContent = `${data.solarRadiation} W/m²`;
   }
-  
-  if (data.soilMoisture) {
+  if (data.soilMoisture && soilMoistureElement) {
     soilMoistureElement.textContent = `${data.soilMoisture}%`;
   }
-  
-  if (data.uvIndex) {
-    uvIndexElement.textContent = data.uvIndex;
+  if (data.uvIndex && uvIndexElement) {
+    uvIndexElement.textContent = data.uvIndex.toFixed(1);
   }
 }
 
-// Update system status indicator
 function updateSystemStatus(status) {
+  if (!statusIndicatorElement) return;
   statusIndicatorElement.className = 'system-status-indicator';
-  
   switch(status) {
     case 'online':
       statusIndicatorElement.classList.add('status-online');
@@ -130,64 +114,46 @@ function updateSystemStatus(status) {
   }
 }
 
-// Simulate rover camera feed
-function initCameraFeed() {
-  // Remove placeholder after 2 seconds to simulate camera loading
-  setTimeout(() => {
-    // Create the video element
-    const video = document.createElement('video');
-    video.id = 'cameraFeed';
-    video.autoplay = true;
-    video.muted = true;
-    video.playsinline = true;
-    
-    // Replace placeholder with video
-    cameraFeedPlaceholder.parentNode.replaceChild(video, cameraFeedPlaceholder);
-    
-    // Show a message if no real camera feed is available
-    video.innerHTML = '<source src="your_camera_feed_url_here" type="video/mp4">';
-    video.poster = '/api/placeholder/640/360';
-  }, 2000);
-}
-
-// Camera control function
-function cameraControl(action) {
-  console.log(`Camera control: ${action}`);
-  if (socket && socket.connected) {
-    socket.emit('cameraControl', { action });
-    showNotification(`Camera ${action} command sent`);
-  } else {
-    showNotification('Cannot control camera: offline mode');
-  }
-}
-
-// Take photo function
-function takePhoto() {
-  console.log('Taking photo');
-  if (socket && socket.connected) {
-    socket.emit('takePhoto', {});
-    showNotification('Photo captured successfully');
-  } else {
-    showNotification('Cannot take photo: offline mode');
-  }
-}
-
-// Send command function
 function sendCommand() {
-  // This would open a modal or navigate to the command page
-  window.location.href = 'commands.html';
+  const commandInput = document.getElementById('commandInput');
+  if (commandInput) {
+    const command = commandInput.value.trim();
+    if (command) {
+      console.log(`Sending command: ${command}`);
+      if (socket && socket.connected) {
+        socket.emit('command', { command });
+        showNotification(`Command sent: ${command}`);
+        commandInput.value = '';
+      } else {
+        showNotification('Cannot send command: offline mode');
+      }
+    } else {
+      showNotification('Please enter a command', 'error');
+    }
+  }
 }
 
-// Download data function
 function downloadData() {
   showNotification('Downloading sensor data...');
-  // This would trigger a download in a real application
-  setTimeout(() => {
-    showNotification('Data downloaded successfully');
-  }, 1500);
+  fetch('/downloadData')
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sensorData.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      showNotification('Data downloaded successfully');
+    })
+    .catch(err => {
+      console.error('Download failed', err);
+      showNotification('Download failed', 'error');
+    });
 }
 
-// Emergency stop function
 function emergencyStop() {
   if (confirm('Are you sure you want to trigger an emergency stop?')) {
     if (socket && socket.connected) {
@@ -199,9 +165,7 @@ function emergencyStop() {
   }
 }
 
-// Simple notification system
 function showNotification(message, type = 'info') {
-  // Create notification element
   const notification = document.createElement('div');
   notification.style.position = 'fixed';
   notification.style.bottom = '20px';
@@ -213,11 +177,7 @@ function showNotification(message, type = 'info') {
   notification.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
   notification.style.zIndex = '1000';
   notification.textContent = message;
-  
-  // Add to document
   document.body.appendChild(notification);
-  
-  // Remove after 3 seconds
   setTimeout(() => {
     notification.style.opacity = '0';
     notification.style.transition = 'opacity 0.5s ease';
@@ -226,7 +186,8 @@ function showNotification(message, type = 'info') {
     }, 500);
   }, 3000);
 }
-// Initialize sensor data state
+
+// Fallback simulation if socket fails
 let sensorData = {
   battery: 75,
   status: 'online',
@@ -240,27 +201,9 @@ let sensorData = {
   uvIndex: 5.2
 };
 
-// Update dashboard function
-function updateDashboard(data) {
-  document.getElementById('battery').textContent = data.battery.toFixed(1) + '%';
-  document.getElementById('status').textContent = data.status;
-  document.getElementById('temperature').textContent = data.temperature.toFixed(1) + '°C';
-  document.getElementById('location').textContent = data.location;
-  document.getElementById('humidity').textContent = data.humidity.toFixed(1) + '%';
-  document.getElementById('pressure').textContent = data.pressure + ' hPa';
-  document.getElementById('windSpeed').textContent = data.windSpeed.toFixed(1) + ' m/s';
-  document.getElementById('solarRadiation').textContent = data.solarRadiation + ' W/m²';
-  document.getElementById('soilMoisture').textContent = data.soilMoisture + '%';
-  document.getElementById('uvIndex').textContent = data.uvIndex.toFixed(1);
-}
-
-// Simulate realistic sensor data with boundaries
 function simulateSensorData() {
-  // Initial dashboard update
   updateDashboard(sensorData);
-
   setInterval(() => {
-    // Simulate sensor value changes
     sensorData.battery = Math.max(0, sensorData.battery - 0.1);
     sensorData.temperature = Math.min(50, Math.max(-10, sensorData.temperature + (Math.random() * 0.4 - 0.2)));
     sensorData.humidity = Math.min(100, Math.max(0, sensorData.humidity + (Math.random() * 2 - 1)));
@@ -269,16 +212,11 @@ function simulateSensorData() {
     sensorData.solarRadiation = Math.max(0, sensorData.solarRadiation + (Math.random() * 5 - 2.5));
     sensorData.soilMoisture = Math.min(100, Math.max(0, sensorData.soilMoisture + (Math.random() * 1.5 - 0.75)));
     sensorData.uvIndex = Math.min(11, Math.max(0, sensorData.uvIndex + (Math.random() * 0.3 - 0.15)));
-
-    // Update UI with new data
     updateDashboard(sensorData);
-
-    // Simulate status changes if battery is empty
     if (sensorData.battery <= 0) {
       sensorData.status = 'offline';
     }
-  }, 1000); // Update every second
+  }, 1000);
 }
 
-// Start simulation
 simulateSensorData();

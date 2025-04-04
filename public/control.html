@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rover Control | Rover Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="control.js" defer></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1><i class="fas fa-rocket"></i> Rover Command</h1>
+      <ul>
+        <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="camera.html"><i class="fas fa-camera"></i> Camera</a></li>
+        <li class="active"><a href="control.html"><i class="fas fa-gamepad"></i> Control</a></li>
+        <li><a href="https://yourserver.com/grafana" target="_blank"><i class="fas fa-chart-line"></i> Analytics</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Control Page -->
+    <main>
+      <div class="dashboard-header">
+        <h2>Rover Control</h2>
+        <div class="status-indicators">
+          <div class="status-pill" id="connectionStatus">
+            <i class="fas fa-circle"></i> Connected
+          </div>
+          <div class="battery-pill" id="batteryStatus">
+            <i class="fas fa-battery-half"></i> <span id="batteryPercentage">75%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-layout">
+        <div class="control-main">
+          <!-- Camera Feed for Control Page -->
+          <div class="control-camera-feed">
+            <div class="camera-feed-placeholder" id="controlCameraFeed">
+              <div style="text-align: center;">
+                <i class="fas fa-video-slash" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <div>Camera Feed Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Control Pad -->
+          <div class="control-pad">
+            <div class="pad-container">
+              <div class="movement-controls">
+                <button class="control-btn forward" id="moveForward"><i class="fas fa-chevron-up"></i></button>
+                <div class="side-controls">
+                  <button class="control-btn left" id="moveLeft"><i class="fas fa-chevron-left"></i></button>
+                  <button class="control-btn stop" id="stopMovement"><i class="fas fa-stop"></i></button>
+                  <button class="control-btn right" id="moveRight"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <button class="control-btn backward" id="moveBackward"><i class="fas fa-chevron-down"></i></button>
+              </div>
+              
+              <div class="speed-control">
+                <h4>Speed</h4>
+                <div class="slider-container">
+                  <input type="range" min="1" max="10" value="5" class="slider" id="speedControl">
+                  <span id="speedValue">5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-sidebar">
+          <div class="actions-panel">
+            <h3><i class="fas fa-tasks"></i> Actions</h3>
+            <div class="action-buttons">
+              <button class="action-control-btn" id="collectSample"><i class="fas fa-vial"></i> Collect Sample</button>
+              <button class="action-control-btn" id="scanArea"><i class="fas fa-search"></i> Scan Area</button>
+              <button class="action-control-btn" id="deployFlag"><i class="fas fa-flag"></i> Deploy Flag</button>
+              <button class="action-control-btn" id="returnToBase"><i class="fas fa-home"></i> Return to Base</button>
+              <button class="action-control-btn danger" id="emergencyStop"><i class="fas fa-exclamation-triangle"></i> Emergency Stop</button>
+            </div>
+          </div>
+
+          <div class="telemetry-panel">
+            <h3><i class="fas fa-tachometer-alt"></i> Telemetry</h3>
+            <div class="telemetry-grid">
+              <div class="telemetry-item">
+                <span class="telemetry-label">Speed</span>
+                <span id="currentSpeed" class="telemetry-value">0.0 m/s</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Heading</span>
+                <span id="currentHeading" class="telemetry-value">N 0°</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Distance</span>
+                <span id="distanceTraveled" class="telemetry-value">0 m</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Motor Temp</span>
+                <span id="motorTemp" class="telemetry-value">45°C</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">CPU Load</span>
+                <span id="cpuLoad" class="telemetry-value">23%</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Signal</span>
+                <span id="signalStrength" class="telemetry-value">86%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="command-log">
+            <h3><i class="fas fa-terminal"></i> Command Log</h3>
+            <div class="log-container" id="commandLog">
+              <div class="log-entry">
+                <span class="log-time">14:32:05</span>
+                <span class="log-message">MOVE_FORWARD executed</span>
+              </div>
+              <div class="log-entry">
+                <span class="log-time">14:31:48</span>
+                <span class="log-message">Speed set to 5</span>
+              </div>
+              <div class="log-entry warning-log">
+                <span class="log-time">14:30:22</span>
+                <span class="log-message">Warning: Battery below 30%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Command Form -->
+      <div class="command-form-section">
+        <h3><i class="fas fa-code"></i> Manual Command</h3>
+        <div class="command-form">
+          <input type="text" id="commandInput" placeholder="Enter manual command...">
+          <button class="action-btn" id="sendCommand"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+      </div>
+    </main>
+    
+    <button id="toggleSidebar" class="toggle-sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+  </body>
+</html>

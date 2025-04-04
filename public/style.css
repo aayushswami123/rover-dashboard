@@ -1,3 +1,4 @@
+/* Base Styles and Variables */
 * {
   margin: 0;
   padding: 0;
@@ -26,6 +27,7 @@ body {
   overflow: hidden;
 }
 
+/* Sidebar Styles */
 .sidebar {
   width: var(--sidebar-width);
   background-color: var(--dark);
@@ -37,6 +39,7 @@ body {
   top: 0;
   z-index: 100;
   transition: var(--transition);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar h1 {
@@ -86,10 +89,15 @@ body {
   color: white;
 }
 
+.sidebar li:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
 .sidebar li:hover a {
   color: white;
 }
 
+/* Toggle Sidebar Button */
 .toggle-sidebar {
   position: fixed;
   top: 20px;
@@ -107,6 +115,8 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* Main Content Area */
 main {
   flex-grow: 1;
   padding: 30px;
@@ -116,6 +126,7 @@ main {
   transition: var(--transition);
 }
 
+/* Dashboard Header */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -126,6 +137,7 @@ main {
 .dashboard-header h2 {
   font-size: 28px;
   font-weight: 600;
+  color: var(--dark);
 }
 
 .user-info {
@@ -146,6 +158,38 @@ main {
   color: var(--dark);
 }
 
+/* Status Indicators */
+.status-indicators {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.battery-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+}
+
+/* Status Cards */
 .status-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -180,6 +224,7 @@ main {
   font-weight: 600;
 }
 
+/* Battery Indicator */
 .battery-indicator {
   height: 10px;
   background-color: #e2e8f0;
@@ -203,6 +248,7 @@ main {
   background-color: var(--warning);
 }
 
+/* System Status Indicators */
 .system-status-indicator {
   display: inline-flex;
   align-items: center;
@@ -228,6 +274,7 @@ main {
   color: var(--danger);
 }
 
+/* Data Container Layout */
 .data-container {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -235,6 +282,7 @@ main {
   margin-bottom: 30px;
 }
 
+/* Sensor Details */
 .sensor-details {
   background-color: var(--card-bg);
   padding: 20px;
@@ -253,7 +301,7 @@ main {
 
 .sensor-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
 }
 
@@ -261,6 +309,12 @@ main {
   padding: 15px;
   border-radius: 8px;
   background-color: #f8fafc;
+  transition: var(--transition);
+}
+
+.sensor-item:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-2px);
 }
 
 .sensor-item h4 {
@@ -274,6 +328,7 @@ main {
   font-weight: 600;
 }
 
+/* Map Container */
 .map-container {
   background-color: var(--card-bg);
   border-radius: 12px;
@@ -287,17 +342,23 @@ main {
   height: 100%;
   background-color: #e2e8f0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #64748b;
   font-weight: 500;
 }
 
-.camera-section {
-  margin-top: 20px;
+/* Grafana Section */
+.grafana-section {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
 }
 
-.camera-section h2 {
+.grafana-section h2 {
   margin-bottom: 20px;
   font-size: 18px;
   color: #1e293b;
@@ -306,56 +367,13 @@ main {
   gap: 8px;
 }
 
-.camera-controls {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.camera-btn {
-  background-color: var(--dark);
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 14px;
-  transition: var(--transition);
-}
-
-.camera-btn:hover {
-  background-color: #334155;
-}
-
-.camera-feed {
-  background-color: var(--card-bg);
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.camera-feed video {
-  width: 100%;
+.grafana-container {
   border-radius: 8px;
-  background-color: #0f172a;
-  aspect-ratio: 16/9;
+  overflow: hidden;
+  background-color: #f8fafc;
 }
 
-.camera-feed-placeholder {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background-color: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-  font-weight: 500;
-  border-radius: 8px;
-}
-
+/* Recent Commands */
 .recent-commands {
   background-color: var(--card-bg);
   padding: 20px;
@@ -418,10 +436,12 @@ main {
   color: var(--danger);
 }
 
+/* Quick Actions */
 .quick-actions {
   display: flex;
   gap: 15px;
   margin-top: 30px;
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -440,11 +460,13 @@ main {
 
 .action-btn:hover {
   background-color: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
 .action-btn.secondary {
   background-color: #f8fafc;
   color: var(--dark);
+  border: 1px solid #e2e8f0;
 }
 
 .action-btn.secondary:hover {
@@ -459,10 +481,472 @@ main {
   background-color: #dc2626;
 }
 
-/* Responsive styles */
+/* Camera and Control Page Specific Styles */
+.camera-layout, .control-layout {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.camera-main, .control-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.camera-feed-container {
+  background-color: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.camera-feed {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.camera-overlay {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.camera-info {
+  display: flex;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px 15px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+}
+
+.camera-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.control-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.camera-btn {
+  padding: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.camera-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.camera-btn.primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+}
+
+.camera-btn.primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.camera-btn.warning {
+  background-color: var(--warning);
+  color: white;
+  border: none;
+}
+
+.camera-btn.warning:hover {
+  background-color: #d97706;
+}
+
+.camera-sidebar, .control-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.camera-settings, .actions-panel, .telemetry-panel, .command-log {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.camera-settings h3, .actions-panel h3, .telemetry-panel h3, .command-log h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+}
+
+.setting-item {
+  margin-bottom: 15px;
+}
+
+.setting-item label {
+  display: block;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.setting-item select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider {
+  flex-grow: 1;
+  height: 6px;
+  appearance: none;
+  background-color: #e2e8f0;
+  outline: none;
+  border-radius: 3px;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Switch Toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e2e8f0;
+  transition: .4s;
+}
+
+.switch .slider.round {
+  border-radius: 24px;
+}
+
+.switch .slider.round:before {
+  border-radius: 50%;
+}
+
+.switch .slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Recent Captures Grid */
+.recent-captures {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.recent-captures h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+}
+
+.captures-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.thumbnail {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.thumbnail span {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+/* Control Pad */
+.control-camera-feed {
+  position: relative;
+  background-color: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.control-pad {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.pad-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.movement-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.control-btn:hover {
+  background-color: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.control-btn.stop {
+  background-color: var(--danger);
+  color: white;
+  border: none;
+}
+
+.control-btn.stop:hover {
+  background-color: #dc2626;
+}
+
+/* Action Buttons Panel */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-control-btn {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+}
+
+.action-control-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.action-control-btn.danger {
+  background-color: var(--danger);
+  color: white;
+  border: none;
+}
+
+.action-control-btn.danger:hover {
+  background-color: #dc2626;
+}
+
+/* Telemetry Data */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.telemetry-item {
+  background-color: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.telemetry-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Command Log */
+.log-container {
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.log-entry {
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+}
+
+.log-time {
+  color: #64748b;
+  margin-right: 10px;
+  font-family: monospace;
+}
+
+.warning-log {
+  color: var(--warning);
+  font-weight: 500;
+}
+
+/* Command Form */
+.command-form-section {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.command-form-section h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+}
+
+.command-form {
+  display: flex;
+  gap: 10px;
+}
+
+.command-form input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+  .sensor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
-  .data-container {
+  .data-container,
+  .camera-layout,
+  .control-layout {
     grid-template-columns: 1fr;
+  }
+  
+  .control-group {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -473,6 +957,7 @@ main {
   
   main {
     margin-left: 0;
+    padding: 20px;
   }
   
   .toggle-sidebar {
@@ -483,15 +968,55 @@ main {
     transform: translateX(0);
   }
   
-  body.sidebar-open main {
-    margin-left: 0;
-  }
-  
   .status-cards {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: 1fr;
   }
   
+  .quick-actions {
+    flex-direction: column;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .camera-controls-panel .control-group {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
   .sensor-grid {
     grid-template-columns: 1fr;
   }
+  
+  .telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .camera-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .command-form {
+    flex-direction: column;
+  }
+  
+  .captures-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Smooth Animations */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.status-online i {
+  animation: pulse 2s infinite;
 }

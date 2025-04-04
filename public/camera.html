@@ -1,918 +1,138 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rover Camera Control</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --success: #10b981;
-      --card-bg: #ffffff;
-      --sidebar-width: 250px;
-      --transition: all 0.3s ease;
-    }
-
-    body {
-      display: flex;
-      background-color: #f0f4f8;
-      color: var(--dark);
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .sidebar {
-      width: var(--sidebar-width);
-      background-color: var(--dark);
-      color: var(--light);
-      padding: 20px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-      transition: var(--transition);
-    }
-
-    .sidebar h1 {
-      font-size: 24px;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      color: white;
-    }
-
-    .sidebar h1 i {
-      margin-right: 10px;
-      font-size: 28px;
-      color: var(--primary);
-    }
-
-    .sidebar ul {
-      list-style: none;
-    }
-
-    .sidebar li {
-      margin: 8px 0;
-      border-radius: 8px;
-      transition: var(--transition);
-    }
-
-    .sidebar li a {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      color: #94a3b8;
-      text-decoration: none;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-
-    .sidebar li a i {
-      margin-right: 10px;
-      font-size: 18px;
-    }
-
-    .sidebar li.active {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar li.active a {
-      color: white;
-    }
-
-    .sidebar li:hover a {
-      color: white;
-    }
-
-    .toggle-sidebar {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 200;
-      background: var(--primary);
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    main {
-      flex-grow: 1;
-      padding: 30px;
-      margin-left: var(--sidebar-width);
-      overflow-y: auto;
-      height: 100vh;
-      transition: var(--transition);
-    }
-
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .page-header h2 {
-      font-size: 28px;
-      font-weight: 600;
-    }
-
-    .camera-container {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .main-camera {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .camera-view {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background-color: #0f172a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #94a3b8;
-      position: relative;
-    }
-
-    .camera-feed {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .camera-overlay {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .camera-status {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: rgba(16, 185, 129, 0.2);
-      color: var(--success);
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .camera-status.offline {
-      background-color: rgba(239, 68, 68, 0.2);
-      color: var(--danger);
-    }
-
-    .camera-coordinates {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-
-    .camera-controls {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-
-    .control-btn {
-      background-color: #f1f5f9;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .control-btn:hover {
-      background-color: #e2e8f0;
-    }
-
-    .control-btn i {
-      font-size: 18px;
-    }
-
-    .control-btn.center {
-      grid-column: 2;
-      grid-row: 2;
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .control-btn.center:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .control-btn.left {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .control-btn.right {
-      grid-column: 3;
-      grid-row: 2;
-    }
-
-    .control-btn.up {
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    .control-btn.down {
-      grid-column: 2;
-      grid-row: 3;
-    }
-
-    .camera-presets {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .presets-header {
-      padding: 15px 20px;
-      background-color: #f8fafc;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .presets-header h3 {
-      font-size: 16px;
-    }
-
-    .presets-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      padding: 15px;
-    }
-
-    .preset-item {
-      background-color: #f1f5f9;
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-      aspect-ratio: 16/9;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .preset-item:hover {
-      transform: scale(1.03);
-    }
-
-    .preset-thumbnail {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .preset-name {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 5px 10px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .additional-controls {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-
-    .camera-actions {
-      grid-column: span 2;
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      padding: 20px;
-    }
-
-    .actions-header {
-      margin-bottom: 15px;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .actions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .action-button {
-      background-color: #f8fafc;
-      border: none;
-      border-radius: 8px;
-      padding: 15px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .action-button:hover {
-      background-color: #e2e8f0;
-    }
-
-    .action-button i {
-      font-size: 20px;
-      color: var(--primary);
-    }
-
-    .action-button span {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .camera-settings {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      padding: 20px;
-    }
-
-    .settings-header {
-      margin-bottom: 15px;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .settings-group {
-      margin-bottom: 15px;
-    }
-
-    .settings-label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .settings-slider {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 8px;
-      border-radius: 4px;
-      background: #e2e8f0;
-      outline: none;
-    }
-
-    .settings-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--primary);
-      cursor: pointer;
-    }
-
-    .settings-slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--primary);
-      cursor: pointer;
-    }
-
-    .history-section {
-      margin-top: 20px;
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .history-header {
-      padding: 15px 20px;
-      background-color: #f8fafc;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .history-header h3 {
-      font-size: 16px;
-    }
-
-    .view-all {
-      font-size: 14px;
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .photos-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      padding: 15px;
-    }
-
-    .photo-item {
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-      aspect-ratio: 1/1;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .photo-item:hover {
-      transform: scale(1.05);
-    }
-
-    .photo-thumbnail {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .photo-time {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 3px 5px;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    /* Responsive styles */
-    @media (max-width: 1024px) {
-      .camera-container {
-        grid-template-columns: 1fr;
-      }
-      
-      .additional-controls {
-        grid-template-columns: 1fr;
-      }
-      
-      .camera-actions {
-        grid-column: span 1;
-      }
-      
-      .photos-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      
-      main {
-        margin-left: 0;
-      }
-      
-      .toggle-sidebar {
-        display: flex;
-      }
-      
-      body.sidebar-open .sidebar {
-        transform: translateX(0);
-      }
-      
-      .actions-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .photos-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .actions-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .photos-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  </style>
-</head>
-<body>
-  <button class="toggle-sidebar" id="toggleSidebar">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <h1><i class="fas fa-rocket"></i> Rover Command</h1>
-    <ul>
-      <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
-      <li><a href="commands.html"><i class="fas fa-terminal"></i> Commands</a></li>
-      <li class="active"><a href="camera.html"><i class="fas fa-camera"></i> Camera</a></li>
-      <li><a href="map.html"><i class="fas fa-map-marker-alt"></i> Navigation</a></li>
-      <li><a href="data.html"><i class="fas fa-chart-line"></i> Data Analysis</a></li>
-      <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-      <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-  </aside>
-
-  <!-- Main Content -->
-  <main>
-    <div class="page-header">
-      <h2>Camera Control</h2>
-      <button class="action-btn" id="takePhoto">
-        <i class="fas fa-camera"></i> Take Photo
-      </button>
-    </div>
-
-    <div class="camera-container">
-      <div class="main-camera">
-        <div class="camera-view">
-          <img src="/api/placeholder/800/450" alt="Camera Feed" class="camera-feed" id="mainCameraFeed">
-          <div class="camera-overlay">
-            <i class="fas fa-video"></i> LIVE
-          </div>
-          <div class="camera-status" id="cameraStatus">
-            <i class="fas fa-circle"></i> Online
-          </div>
-          <div class="camera-coordinates">
-            Pan: 45° | Tilt: 15° | Zoom: 1.5x
-          </div>
-        </div>
-        <div class="camera-controls">
-          <button class="control-btn up" id="tiltUp">
-            <i class="fas fa-chevron-up"></i>
-          </button>
-          <button class="control-btn left" id="panLeft">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button class="control-btn center" id="resetCamera">
-            <i class="fas fa-bullseye"></i>
-          </button>
-          <button class="control-btn right" id="panRight">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-          <button class="control-btn down" id="tiltDown">
-            <i class="fas fa-chevron-down"></i>
-          </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rover Camera | Rover Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="camera.js" defer></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1><i class="fas fa-rocket"></i> Rover Command</h1>
+      <ul>
+        <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="active"><a href="camera.html"><i class="fas fa-camera"></i> Camera</a></li>
+        <li><a href="control.html"><i class="fas fa-gamepad"></i> Control</a></li>
+        <li><a href="https://yourserver.com/grafana" target="_blank"><i class="fas fa-chart-line"></i> Analytics</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Camera Page -->
+    <main>
+      <div class="dashboard-header">
+        <h2>Camera Control</h2>
+        <div class="status-pill" id="connectionStatus">
+          <i class="fas fa-circle"></i> Connected
         </div>
       </div>
 
-      <div class="camera-presets">
-        <div class="presets-header">
-          <h3>Camera Presets</h3>
-          <button class="control-btn" style="padding: 5px; background: transparent;">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
-        <div class="presets-grid">
-          <div class="preset-item">
-            <img src="/api/placeholder/200/112" alt="Front View" class="preset-thumbnail">
-            <div class="preset-name">Front View</div>
+      <div class="camera-layout">
+        <div class="camera-main">
+          <div class="camera-feed-container">
+            <div class="camera-feed">
+              <div class="camera-feed-placeholder" id="cameraFeedPlaceholder">
+                <div style="text-align: center;">
+                  <i class="fas fa-video-slash" style="font-size: 32px; margin-bottom: 10px;"></i>
+                  <div>Camera Feed Loading...</div>
+                </div>
+              </div>
+            </div>
+            <div class="camera-overlay">
+              <div class="camera-info">
+                <span id="cameraResolution">HD (1280x720)</span>
+                <span id="cameraFps">30 FPS</span>
+                <span id="cameraLatency">Latency: 235ms</span>
+              </div>
+            </div>
           </div>
-          <div class="preset-item">
-            <img src="/api/placeholder/200/112" alt="Arm Camera" class="preset-thumbnail">
-            <div class="preset-name">Arm Camera</div>
+
+          <div class="camera-controls-panel">
+            <div class="control-group">
+              <button class="camera-btn" id="panLeft"><i class="fas fa-arrow-left"></i> Pan Left</button>
+              <button class="camera-btn" id="panUp"><i class="fas fa-arrow-up"></i> Pan Up</button>
+              <button class="camera-btn" id="panDown"><i class="fas fa-arrow-down"></i> Pan Down</button>
+              <button class="camera-btn" id="panRight"><i class="fas fa-arrow-right"></i> Pan Right</button>
+            </div>
+            <div class="control-group">
+              <button class="camera-btn" id="zoomIn"><i class="fas fa-search-plus"></i> Zoom In</button>
+              <button class="camera-btn" id="zoomOut"><i class="fas fa-search-minus"></i> Zoom Out</button>
+              <button class="camera-btn primary" id="takePhoto"><i class="fas fa-camera"></i> Take Photo</button>
+              <button class="camera-btn warning" id="toggleRecord"><i class="fas fa-record-vinyl"></i> Record</button>
+            </div>
           </div>
-          <div class="preset-item">
-            <img src="/api/placeholder/200/112" alt="Ground View" class="preset-thumbnail">
-            <div class="preset-name">Ground View</div>
+        </div>
+
+        <div class="camera-sidebar">
+          <div class="camera-settings">
+            <h3><i class="fas fa-sliders-h"></i> Camera Settings</h3>
+            
+            <div class="setting-item">
+              <label>Resolution</label>
+              <select id="resolutionSelect">
+                <option value="720p">HD (1280x720)</option>
+                <option value="1080p">Full HD (1920x1080)</option>
+                <option value="480p">SD (640x480)</option>
+              </select>
+            </div>
+            
+            <div class="setting-item">
+              <label>Frame Rate</label>
+              <select id="fpsSelect">
+                <option value="30">30 FPS</option>
+                <option value="15">15 FPS</option>
+                <option value="5">5 FPS (Low Bandwidth)</option>
+              </select>
+            </div>
+            
+            <div class="setting-item">
+              <label>Image Quality</label>
+              <div class="slider-container">
+                <input type="range" min="1" max="10" value="8" class="slider" id="qualitySlider">
+                <span id="qualityValue">8</span>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <label>Night Mode</label>
+              <label class="switch">
+                <input type="checkbox" id="nightModeToggle">
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
-          <div class="preset-item">
-            <img src="/api/placeholder/200/112" alt="Panorama" class="preset-thumbnail">
-            <div class="preset-name">360° Panorama</div>
+
+          <div class="recent-captures">
+            <h3><i class="fas fa-images"></i> Recent Captures</h3>
+            <div class="captures-grid" id="capturesGrid">
+              <!-- Thumbnails will be inserted here by JS -->
+              <div class="thumbnail">
+                <img src="/api/placeholder/150/100" alt="Capture 1">
+                <span>12:45 PM</span>
+              </div>
+              <div class="thumbnail">
+                <img src="/api/placeholder/150/100" alt="Capture 2">
+                <span>12:30 PM</span>
+              </div>
+              <div class="thumbnail">
+                <img src="/api/placeholder/150/100" alt="Capture 3">
+                <span>12:15 PM</span>
+              </div>
+              <div class="thumbnail">
+                <img src="/api/placeholder/150/100" alt="Capture 4">
+                <span>12:00 PM</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="additional-controls">
-      <div class="camera-actions">
-        <h3 class="actions-header">Camera Actions</h3>
-        <div class="actions-grid">
-          <button class="action-button">
-            <i class="fas fa-search-plus"></i>
-            <span>Zoom In</span>
-          </button>
-          <button class="action-button">
-            <i class="fas fa-search-minus"></i>
-            <span>Zoom Out</span>
-          </button>
-          <button class="action-button">
-            <i class="fas fa-sync"></i>
-            <span>Auto Focus</span>
-          </button>
-          <button class="action-button">
-            <i class="fas fa-film"></i>
-            <span>Record Video</span>
-          </button>
-          <button class="action-button">
-            <i class="fas fa-diagnoses"></i>
-            <span>Analyze View</span>
-          </button>
-          <button class="action-button">
-            <i class="fas fa-th-large"></i>
-            <span>Grid Overlay</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="camera-settings">
-        <h3 class="settings-header">Camera Settings</h3>
-        <div class="settings-group">
-          <label class="settings-label">Brightness</label>
-          <input type="range" class="settings-slider" min="0" max="100" value="60">
-        </div>
-        <div class="settings-group">
-          <label class="settings-label">Contrast</label>
-          <input type="range" class="settings-slider" min="0" max="100" value="50">
-        </div>
-        <div class="settings-group">
-          <label class="settings-label">Sharpness</label>
-          <input type="range" class="settings-slider" min="0" max="100" value="70">
-        </div>
-      </div>
-    </div>
-
-    <div class="history-section">
-      <div class="history-header">
-        <h3>Recent Photos</h3>
-        <a href="#" class="view-all">View All</a>
-      </div>
-      <div class="photos-grid">
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 1" class="photo-thumbnail">
-          <div class="photo-time">10:45 AM</div>
-        </div>
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 2" class="photo-thumbnail">
-          <div class="photo-time">10:30 AM</div>
-        </div>
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 3" class="photo-thumbnail">
-          <div class="photo-time">10:15 AM</div>
-        </div>
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 4" class="photo-thumbnail">
-          <div class="photo-time">9:50 AM</div>
-        </div>
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 5" class="photo-thumbnail">
-          <div class="photo-time">9:30 AM</div>
-        </div>
-        <div class="photo-item">
-          <img src="/api/placeholder/100/100" alt="Photo 6" class="photo-thumbnail">
-          <div class="photo-time">9:15 AM</div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // DOM Elements
-    const toggleSidebarBtn = document.getElementById('toggleSidebar');
-    const mainCameraFeed = document.getElementById('mainCameraFeed');
-    const cameraStatus = document.getElementById('cameraStatus');
-    const takePhotoBtn = document.getElementById('takePhoto');
+    </main>
     
-    // Camera control buttons
-    const tiltUpBtn = document.getElementById('tiltUp');
-    const tiltDownBtn = document.getElementById('tiltDown');
-    const panLeftBtn = document.getElementById('panLeft');
-    const panRightBtn = document.getElementById('panRight');
-    const resetCameraBtn = document.getElementById('resetCamera');
-
-    // Toggle sidebar on mobile
-    toggleSidebarBtn.addEventListener('click', () => {
-      document.body.classList.toggle('sidebar-open');
-    });
-
-    // Current camera position
-    let cameraPosition = {
-      pan: 45,
-      tilt: 15,
-      zoom: 1.5
-    };
-
-    // Camera controls
-    tiltUpBtn.addEventListener('click', () => {
-      cameraPosition.tilt = Math.min(90, cameraPosition.tilt + 5);
-      updateCameraPosition();
-      sendCameraCommand('tilt', cameraPosition.tilt);
-    });
-
-    tiltDownBtn.addEventListener('click', () => {
-      cameraPosition.tilt = Math.max(-30, cameraPosition.tilt - 5);
-      updateCameraPosition();
-      sendCameraCommand('tilt', cameraPosition.tilt);
-    });
-
-    panLeftBtn.addEventListener('click', () => {
-      cameraPosition.pan = (cameraPosition.pan - 5) % 360;
-      if (cameraPosition.pan < 0) cameraPosition.pan += 360;
-      updateCameraPosition();
-      sendCameraCommand('pan', cameraPosition.pan);
-    });
-
-    panRightBtn.addEventListener('click', () => {
-      cameraPosition.pan = (cameraPosition.pan + 5) % 360;
-      updateCameraPosition();
-      sendCameraCommand('pan', cameraPosition.pan);
-    });
-
-    resetCameraBtn.addEventListener('click', () => {
-      cameraPosition = { pan: 0, tilt: 0, zoom: 1.0 };
-      updateCameraPosition();
-      sendCameraCommand('reset');
-    });
-
-    takePhotoBtn.addEventListener('click', () => {
-      takePhoto();
-    });
-
-    // Update camera position display
-    function updateCameraPosition() {
-      const coordinatesDisplay = document.querySelector('.camera-coordinates');
-      coordinatesDisplay.textContent = `Pan: ${cameraPosition.pan}° | Tilt: ${cameraPosition.tilt}° | Zoom: ${cameraPosition.zoom}x`;
-    }
-
-    // Send camera command to server
-    function sendCameraCommand(command, value) {
-      console.log(`Sending camera command: ${command} - ${value}`);
-      // In a real implementation, you would send this to the server
-      // socket.emit('cameraCommand', { command, value });
-      
-      // Show a notification for demo purposes
-      showNotification(`Camera ${command} set to ${value}`);
-    }
-
-    // Take a photo
-    function takePhoto() {
-      // Flash effect
-      mainCameraFeed.style.filter = 'brightness(1.5)';
-      setTimeout(() => {
-        mainCameraFeed.style.filter = 'brightness(1)';
-      }, 150);
-      
-      // In a real implementation, you would send this to the server
-      // socket.emit('takePhoto');
-      
-      // Show a notification
-      showNotification('Photo captured successfully');
-      
-      // Add photo to recent photos (in a real implementation)
-      const now = new Date();
-      const time = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-      
-      // Simulate adding to recent photos
-      simulateNewPhoto(time);
-    }
-
-    // Simulate adding a new photo to the grid
-    function simulateNewPhoto(time) {
-      const photosGrid = document.querySelector('.photos-grid');
-      
-      // Create new photo item
-      const newPhoto = document.createElement('div');
-      newPhoto.className = 'photo-item';
-      
-      // Create random placeholder (in reality, this would be the actual photo)
-      const randomId = Math.floor(Math.random() * 1000);
-      newPhoto.innerHTML = `
-        <img src="/api/placeholder/100/100?id=${randomId}" alt="New Photo" class="photo-thumbnail">
-        <div class="photo-time">${time}</div>
-      `;
-      
-      // Add to the beginning of the grid
-      photosGrid.insertBefore(newPhoto, photosGrid.firstChild);
-      
-      // Remove the last photo if there are more than 6
-      if (photosGrid.children.length > 6) {
-        photosGrid.removeChild(photosGrid.lastChild);
-      }
-      
-      // Add animation
-      newPhoto.style.animation = 'fadeIn 0.5s';
-    }
-
-    // Simple notification system
-    function showNotification(message, type = 'info') {
-      // Create notification element
-      const notification = document.createElement('div');
-      notification.style.position = 'fixed';
-      notification.style.bottom = '20px';
-      notification.style.right = '20px';
-      notification.style.padding = '10px 20px';
-      notification.style.borderRadius = '8px';
-      notification.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
-      notification.style.color = 'white';
-      notification.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
-      notification.style.zIndex = '1000';
-      notification.textContent = message;
-      
-      // Add to document
-      document.body.appendChild(notification);
-      
-      // Remove after 3 seconds
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 500);
-      }, 3000);
-    }
-
-    // Initialize camera feed simulation
-    function initCameraFeed() {
-      // Set random refreshing of camera image to simulate a video feed
-      setInterval(() => {
-        const timestamp = new Date().getTime();
-        mainCameraFeed.src = `/api/placeholder/800/450?t=${timestamp}`;
-      }, 2000);
-      
-      // Randomly change camera status (for demo purposes)
-      setInterval(() => {
-        if (Math.random() < 0.1) { // 10% chance to change status
-          if (cameraStatus.classList.contains('offline')) {
-            cameraStatus.classList.remove('offline');
-            cameraStatus.innerHTML = '<i class="fas fa-circle"></i> Online';
-            showNotification('Camera connection restored', 'info');
-          } else {
-            cameraStatus.classList.add('offline');
-            cameraStatus.innerHTML = '<i class="fas fa-times-circle"></i> Offline';
-            showNotification('Camera connection lost', 'error');
-          }
-        }
-      }, 15000);
-    }
-
-    // Initialize
-    initCameraFeed();
-  </script>
-</body>
+    <button id="toggleSidebar" class="toggle-sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+  </body>
 </html>

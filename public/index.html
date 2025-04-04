@@ -5,163 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rover Dashboard</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js" defer></script>
   </head>
   <body>
     <!-- Sidebar -->
-  <aside class="sidebar">
-    <h1><i class="fas fa-rocket"></i> Rover Command</h1>
-    <ul>
-      <li class="active"><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
-      <li><a href="commands.html"><i class="fas fa-terminal"></i> Commands</a></li>
-      <li><a href="camera.html"><i class="fas fa-camera"></i> Camera</a></li>
-      <li><a href="map.html"><i class="fas fa-map-marker-alt"></i> Navigation</a></li>
-      <li><a href="data.html"><i class="fas fa-chart-line"></i> Data Analysis</a></li>
-      <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-      <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-  </aside>
+    <aside class="sidebar">
+      <h1><i class="fas fa-rocket"></i> Rover Command</h1>
+      <ul>
+        <li class="active"><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="camera.html"><i class="fas fa-camera"></i> Camera</a></li>
+        <li><a href="control.html"><i class="fas fa-gamepad"></i> Control</a></li>
+        <li><a href="https://yourserver.com/grafana" target="_blank"><i class="fas fa-chart-line"></i> Analytics</a></li>
+      </ul>
+    </aside>
 
-  <!-- Main Dashboard -->
-  <main>
-    <div class="dashboard-header">
-      <h2>Mission Control Dashboard</h2>
-      <div class="user-info">
-        <span>Mission Controller</span>
-        <div class="user-avatar">MC</div>
-      </div>
-    </div>
-
-    <div class="status-cards">
-      <div class="card">
-        <h3><i class="fas fa-battery-half"></i> Battery Status</h3>
-        <p id="battery">75%</p>
-        <div class="battery-indicator">
-          <div class="battery-level" id="batteryLevel" style="width: 75%"></div>
-        </div>
-      </div>
-      <div class="card">
-        <h3><i class="fas fa-robot"></i> System Status</h3>
-        <p id="statusIndicator" class="system-status-indicator status-online">
-          <i class="fas fa-circle"></i> Online
-        </p>
-      </div>
-      <div class="card">
-        <h3><i class="fas fa-temperature-high"></i> Temperature</h3>
-        <p id="temperature">22.5°C</p>
-      </div>
-      <div class="card">
-        <h3><i class="fas fa-map-pin"></i> Location</h3>
-        <p id="location">Grid A-15</p>
-      </div>
-    </div>
-
-    <div class="data-container">
-      <div class="sensor-details">
-        <h2><i class="fas fa-microchip"></i> Sensor Data</h2>
-        <div class="sensor-grid">
-          <div class="sensor-item">
-            <h4>Humidity</h4>
-            <p id="humidity">42%</p>
-          </div>
-          <div class="sensor-item">
-            <h4>Pressure</h4>
-            <p id="pressure">1013 hPa</p>
-          </div>
-          <div class="sensor-item">
-            <h4>Wind Speed</h4>
-            <p id="windSpeed">3.2 m/s</p>
-          </div>
-          <div class="sensor-item">
-            <h4>Solar Radiation</h4>
-            <p id="solarRadiation">750 W/m²</p>
-          </div>
-          <div class="sensor-item">
-            <h4>Soil Moisture</h4>
-            <p id="soilMoisture">28%</p>
-          </div>
-          <div class="sensor-item">
-            <h4>UV Index</h4>
-            <p id="uvIndex">5.2</p>
-          </div>
+    <!-- Main Dashboard -->
+    <main>
+      <div class="dashboard-header">
+        <h2>Mission Control Dashboard</h2>
+        <div class="user-info">
+          <span>Mission Controller</span>
+          <div class="user-avatar">MC</div>
         </div>
       </div>
 
-      <div class="map-container">
-        <div class="map-placeholder" id="map">
-          <i class="fas fa-map-marked-alt" style="font-size: 32px; margin-bottom: 10px;"></i>
-          <div>Rover Location Map</div>
+      <div class="status-cards">
+        <div class="card">
+          <h3><i class="fas fa-battery-half"></i> Battery Status</h3>
+          <p id="battery">75%</p>
+          <div class="battery-indicator">
+            <div class="battery-level" id="batteryLevel" style="width: 75%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-robot"></i> System Status</h3>
+          <p id="statusIndicator" class="system-status-indicator status-online">
+            <i class="fas fa-circle"></i> Online
+          </p>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-temperature-high"></i> Temperature</h3>
+          <p id="temperature">22.5°C</p>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-map-pin"></i> Location</h3>
+          <p id="location">Grid A-15</p>
         </div>
       </div>
-    </div>
 
-    <section class="camera-section">
-      <h2><i class="fas fa-video"></i> Camera Feed</h2>
-      <div class="camera-controls">
-        <button class="camera-btn" id="panLeft"><i class="fas fa-arrow-left"></i> Pan Left</button>
-        <button class="camera-btn" id="panUp"><i class="fas fa-arrow-up"></i> Pan Up</button>
-        <button class="camera-btn" id="panDown"><i class="fas fa-arrow-down"></i> Pan Down</button>
-        <button class="camera-btn" id="panRight"><i class="fas fa-arrow-right"></i> Pan Right</button>
-        <button class="camera-btn" id="zoomIn"><i class="fas fa-search-plus"></i> Zoom In</button>
-        <button class="camera-btn" id="zoomOut"><i class="fas fa-search-minus"></i> Zoom Out</button>
-        <button class="camera-btn" id="takePhoto"><i class="fas fa-camera"></i> Take Photo</button>
-      </div>
-      <div class="camera-feed">
-        <div class="camera-feed-placeholder" id="cameraFeedPlaceholder">
-          <div style="text-align: center;">
-            <i class="fas fa-video-slash" style="font-size: 32px; margin-bottom: 10px;"></i>
-            <div>Camera Feed Loading...</div>
+      <div class="data-container">
+        <div class="sensor-details">
+          <h2><i class="fas fa-microchip"></i> Sensor Data</h2>
+          <div class="sensor-grid">
+            <div class="sensor-item">
+              <h4>Humidity</h4>
+              <p id="humidity">42%</p>
+            </div>
+            <div class="sensor-item">
+              <h4>Pressure</h4>
+              <p id="pressure">1013 hPa</p>
+            </div>
+            <div class="sensor-item">
+              <h4>Wind Speed</h4>
+              <p id="windSpeed">3.2 m/s</p>
+            </div>
+            <div class="sensor-item">
+              <h4>Solar Radiation</h4>
+              <p id="solarRadiation">750 W/m²</p>
+            </div>
+            <div class="sensor-item">
+              <h4>Soil Moisture</h4>
+              <p id="soilMoisture">28%</p>
+            </div>
+            <div class="sensor-item">
+              <h4>UV Index</h4>
+              <p id="uvIndex">5.2</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div class="map-placeholder" id="map">
+            <i class="fas fa-map-marked-alt" style="font-size: 32px; margin-bottom: 10px;"></i>
+            <div>Rover Location Map</div>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="recent-commands">
-      <h2><i class="fas fa-history"></i> Recent Commands</h2>
-      <table class="commands-table">
-        <thead>
-          <tr>
-            <th>Command</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>MOVE_FORWARD</td>
-            <td>10:45 AM</td>
-            <td><span class="command-status status-completed">Completed</span></td>
-            <td>Forward movement by 5 meters</td>
-          </tr>
-          <tr>
-            <td>COLLECT_SAMPLE</td>
-            <td>10:30 AM</td>
-            <td><span class="command-status status-executing">Executing</span></td>
-            <td>Soil collection at current location</td>
-          </tr>
-          <tr>
-            <td>SCAN_AREA</td>
-            <td>10:15 AM</td>
-            <td><span class="command-status status-completed">Completed</span></td>
-            <td>360° scan of surroundings</td>
-          </tr>
-          <tr>
-            <td>ROTATE_CAMERA</td>
-            <td>09:50 AM</td>
-            <td><span class="command-status status-failed">Failed</span></td>
-            <td>Camera rotation attempt</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <!-- Grafana Embedded Dashboard -->
+      <section class="grafana-section">
+        <h2><i class="fas fa-chart-area"></i> Sensor Trends</h2>
+        <div class="grafana-container">
+          <iframe 
+            src="https://yourserver.com/grafana/d/rover-dashboard/rover-sensor-data?orgId=1&from=now-1h&to=now&theme=light" 
+            width="100%" 
+            height="400" 
+            frameborder="0">
+          </iframe>
+        </div>
+      </section>
 
-    <div class="quick-actions">
-      <button class="action-btn" id="sendCommand"><i class="fas fa-paper-plane"></i> Send Command</button>
-      <button class="action-btn secondary" id="downloadData"><i class="fas fa-download"></i> Download Data</button>
-      <button class="action-btn danger" id="emergencyStop"><i class="fas fa-exclamation-triangle"></i> Emergency Stop</button>
-    </div>
-  </main>
+      <section class="recent-commands">
+        <h2><i class="fas fa-history"></i> Recent Commands</h2>
+        <table class="commands-table">
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="commandsTableBody">
+            <tr>
+              <td>MOVE_FORWARD</td>
+              <td>10:45 AM</td>
+              <td><span class="command-status status-completed">Completed</span></td>
+              <td>Forward movement by 5 meters</td>
+            </tr>
+            <tr>
+              <td>COLLECT_SAMPLE</td>
+              <td>10:30 AM</td>
+              <td><span class="command-status status-executing">Executing</span></td>
+              <td>Soil collection at current location</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="quick-actions">
+        <button class="action-btn" id="goToControl"><i class="fas fa-gamepad"></i> Control Rover</button>
+        <button class="action-btn secondary" id="downloadData"><i class="fas fa-download"></i> Download Data</button>
+        <button class="action-btn danger" id="emergencyStop"><i class="fas fa-exclamation-triangle"></i> Emergency Stop</button>
+      </div>
+    </main>
+    
+    <button id="toggleSidebar" class="toggle-sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
   </body>
 </html>
