@@ -218,5 +218,50 @@ function simulateSensorData() {
     }
   }, 1000);
 }
+// Listen for command log updates from the server
+if (socket) {
+  socket.on('commandLogUpdate', (log) => {
+    updateRecentCommands(log);
+  });
+}
+
+// Function to update the Recent Commands table in index.html
+function updateRecentCommands(log) {
+  const tableBody = document.getElementById('commandsTableBody');
+  if (!tableBody) return;
+
+  // Clear existing rows
+  tableBody.innerHTML = '';
+
+  // Loop through the log and create a new row for each command
+  log.forEach(entry => {
+    const row = document.createElement('tr');
+    
+    const commandCell = document.createElement('td');
+    commandCell.textContent = entry.command;
+    
+    const timeCell = document.createElement('td');
+    timeCell.textContent = entry.time;
+    
+    const statusCell = document.createElement('td');
+    const statusSpan = document.createElement('span');
+    // Adjust class based on the status if needed; here we use a default "Completed" style.
+    statusSpan.className = 'command-status status-completed';
+    statusSpan.textContent = entry.status;
+    statusCell.appendChild(statusSpan);
+    
+    const descriptionCell = document.createElement('td');
+    // Optionally, you can customize the description. Here we use a default description.
+    descriptionCell.textContent = 'Command sent via dashboard';
+    
+    row.appendChild(commandCell);
+    row.appendChild(timeCell);
+    row.appendChild(statusCell);
+    row.appendChild(descriptionCell);
+    
+    tableBody.appendChild(row);
+  });
+}
+
 
 simulateSensorData();

@@ -1,12 +1,24 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { InfluxDB, Point } = require('@influxdata/influxdb-client');
+
+// InfluxDB configuration – replace these with your actual details.
+const influxURL = 'http://localhost:8086'; // or your InfluxDB Cloud URL
+const influxToken = 'YOUR_INFLUXDB_TOKEN';
+const influxOrg = 'YOUR_ORG';
+const influxBucket = 'YOUR_BUCKET';
+
+// Create InfluxDB client and write API.
+const influxDB = new InfluxDB({ url: influxURL, token: influxToken });
+const writeApi = influxDB.getWriteApi(influxOrg, influxBucket, 'ns'); // 'ns' for nanosecond precision
+writeApi.useDefaultTags({ host: 'rover-server' });
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Global command log array
+// Global command log array to store all commands.
 let commandLog = [];
 
 // Serve static files (HTML, CSS, JS)
@@ -16,14 +28,14 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Endpoint for data download (returns simulated sensor data)
+// Endpoint for data download (returns simulated sensor data and command log)
 app.get('/downloadData', (req, res) => {
   const data = {
     sensorData: [
       { timestamp: Date.now(), battery: 75, temperature: 22.5, humidity: 42 },
       { timestamp: Date.now() - 1000, battery: 74, temperature: 22.6, humidity: 42.2 }
     ],
-    commands: commandLog // Return the command log as part of the download
+    commands: commandLog
   };
   res.setHeader('Content-Disposition', 'attachment; filename="sensorData.json"');
   res.setHeader('Content-Type', 'application/json');
@@ -52,35 +64,44 @@ io.on('connection', (socket) => {
 
   const intervalId = setInterval(sendSensorData, 1000);
 
-  // Handle camera control commands
+  // Handle camera control commands.
   socket.on('cameraControl', (data) => {
     console.log(`Camera control received: ${data.action}`);
-    // Insert actual camera control code here if available
+    // Add your camera control code here.
   });
   
-  // Handle photo capture requests
+  // Handle photo capture requests.
   socket.on('takePhoto', () => {
     console.log('Photo capture requested');
-    // Insert actual photo capture code here if available
+    // Add your photo capture code here.
   });
   
-  // Handle emergency stop
+  // Handle emergency stop.
   socket.on('emergencyStop', () => {
     console.log('EMERGENCY STOP ACTIVATED');
-    // Insert actual emergency stop code here if available
+    // Add your emergency stop code here.
   });
 
-  // Handle manual command events
+  // Handle manual command events.
   socket.on('command', (data) => {
-    const timestamp = new Date().toLocaleTimeString();
+    const timestamp = new Date();
     const entry = {
-      time: timestamp,
+      time: timestamp.toLocaleTimeString(),
       command: data.command,
       status: 'Completed'
     };
     commandLog.push(entry);
     console.log('Received command:', data.command);
-    // Broadcast the updated command log to all clients
+
+    // Write the command to InfluxDB.
+    const point = new Point('rover_commands')
+      .tag('source', 'dashboard')
+      .stringField('command', data.command)
+      .stringField('status', 'Completed')
+      .timestamp(timestamp);
+    writeApi.writePoint(point);
+
+    // Broadcast the updated command log to all clients.
     io.emit('commandLogUpdate', commandLog);
   });
 
