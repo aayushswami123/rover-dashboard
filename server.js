@@ -3,11 +3,12 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { InfluxDB, Point } = require('@influxdata/influxdb-client');
 
-// InfluxDB configuration – replace these with your actual details.
-const influxURL = 'http://localhost:8086'; // or your InfluxDB Cloud URL
-const influxToken = 'YOUR_INFLUXDB_TOKEN';
-const influxOrg = 'YOUR_ORG';
-const influxBucket = 'YOUR_BUCKET';
+// Updated InfluxDB configuration with provided credentials.
+// Note: In InfluxDB 2, you must use an API token. If you haven’t generated one, please do so.
+const influxURL = 'http://ii-lab-cyclops-grafana.dhcp.asu.edu:8086/';
+const influxToken = 'NjHJaJtNJSXB7ftyd5yii4B3r'; // Provided token (ensure this is your API token)
+const influxOrg = 'YOUR_ORG';      // Replace with your organization name
+const influxBucket = 'YOUR_BUCKET'; // Replace with your bucket name
 
 // Create InfluxDB client and write API.
 const influxDB = new InfluxDB({ url: influxURL, token: influxToken });
